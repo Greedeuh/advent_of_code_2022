@@ -66,7 +66,7 @@ mod test {
         assert_eq!(overlaps(1..=2, 2..=3), true);
         assert_eq!(overlaps(1..=3, 2..=3), true);
         assert_eq!(overlaps(1..=100, 1..=100), true);
-        assert_eq!(overlaps(1..=100, 200..=300), true);
+        assert_eq!(overlaps(1..=100, 200..=300), false);
     }
 }
 
