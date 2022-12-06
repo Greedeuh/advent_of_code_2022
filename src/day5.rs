@@ -19,7 +19,20 @@ pub fn part1() {
 }
 
 pub fn part2() {
-    println!("day5, part2: {:?}", "answer");
+    let (crates, instructions) = split_input(&input());
+    let crates = parse_crates(&crates);
+    let answer: String = instructions
+        .split('\n')
+        .into_iter()
+        .map(parse_instruction)
+        .fold(crates, apply_insane_instruction)
+        .into_iter()
+        .map(|mut column| column.pop())
+        .filter(|last| last.is_some())
+        .map(|last| last.unwrap())
+        .collect();
+
+    println!("day5, part2: {:?}", answer);
 }
 
 fn split_input<'a>(input: &str) -> (String, String) {
@@ -82,9 +95,25 @@ fn apply_instruction(
     chars
 }
 
+fn apply_insane_instruction(
+    mut chars: Vec<Vec<char>>,
+    (mov, from, to): (usize, usize, usize),
+) -> Vec<Vec<char>> {
+    let from = from - 1;
+    let to = to - 1;
+
+    let moving_index = chars[from].len() - mov;
+    let moving_crates: Vec<_> = chars[from].drain(moving_index..).collect();
+    chars[to].extend(moving_crates);
+
+    chars
+}
+
 #[cfg(test)]
 mod test {
-    use crate::day5::{apply_instruction, parse_crates_row, parse_instruction};
+    use crate::day5::{
+        apply_insane_instruction, apply_instruction, parse_crates_row, parse_instruction,
+    };
 
     use super::{parse_crates, split_input};
 
@@ -285,6 +314,93 @@ move 6 from 6 to 5",
             vec![
                 vec![],
                 vec!['L', 'C', 'L', 'W'],
+                vec!['C', 'W'],
+                vec!['W', 'C'],
+                vec!['C', 'P'],
+                vec!['P', 'T'],
+                vec!['T', 'M'],
+                vec!['M', 'Z'],
+                vec!['Z', 'W']
+            ]
+        );
+    }
+
+    #[test]
+    fn apply_insane_instruction_bim() {
+        assert_eq!(
+            apply_insane_instruction(
+                vec![
+                    vec!['W', 'L'],
+                    vec!['L', 'C'],
+                    vec!['C', 'W'],
+                    vec!['W', 'C'],
+                    vec!['C', 'P'],
+                    vec!['P', 'T'],
+                    vec!['T', 'M'],
+                    vec!['M', 'Z'],
+                    vec!['Z', 'W']
+                ],
+                (1, 1, 1)
+            ),
+            vec![
+                vec!['W', 'L'],
+                vec!['L', 'C'],
+                vec!['C', 'W'],
+                vec!['W', 'C'],
+                vec!['C', 'P'],
+                vec!['P', 'T'],
+                vec!['T', 'M'],
+                vec!['M', 'Z'],
+                vec!['Z', 'W']
+            ]
+        );
+
+        assert_eq!(
+            apply_insane_instruction(
+                vec![
+                    vec!['W', 'L'],
+                    vec!['L', 'C'],
+                    vec!['C', 'W'],
+                    vec!['W', 'C'],
+                    vec!['C', 'P'],
+                    vec!['P', 'T'],
+                    vec!['T', 'M'],
+                    vec!['M', 'Z'],
+                    vec!['Z', 'W']
+                ],
+                (1, 1, 2)
+            ),
+            vec![
+                vec!['W'],
+                vec!['L', 'C', 'L'],
+                vec!['C', 'W'],
+                vec!['W', 'C'],
+                vec!['C', 'P'],
+                vec!['P', 'T'],
+                vec!['T', 'M'],
+                vec!['M', 'Z'],
+                vec!['Z', 'W']
+            ]
+        );
+
+        assert_eq!(
+            apply_insane_instruction(
+                vec![
+                    vec!['W', 'L'],
+                    vec!['L', 'C'],
+                    vec!['C', 'W'],
+                    vec!['W', 'C'],
+                    vec!['C', 'P'],
+                    vec!['P', 'T'],
+                    vec!['T', 'M'],
+                    vec!['M', 'Z'],
+                    vec!['Z', 'W']
+                ],
+                (2, 1, 2)
+            ),
+            vec![
+                vec![],
+                vec!['L', 'C', 'W', 'L'],
                 vec!['C', 'W'],
                 vec!['W', 'C'],
                 vec!['C', 'P'],

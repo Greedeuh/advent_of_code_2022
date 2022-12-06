@@ -1,4 +1,5 @@
 #![feature(iter_array_chunks)]
+#![feature(slice_take)]
 
 mod day3;
 mod day4;
